@@ -1,0 +1,57 @@
+﻿@page "/Dashboard/CreateUser"
+
+@attribute [Authorize]
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Create User</h3>
+
+
+<EditForm Model="User" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="User.Name"></InputText>
+        <ValidationMessage For="@(()=>User.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Email</label>
+        <InputText @bind-Value="User.Email"></InputText>
+        <ValidationMessage For="@(()=>User.Email)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">UserName</label>
+        <InputText @bind-Value="User.UserName"></InputText>
+        <ValidationMessage For="@(()=>User.UserName)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    private User User { get; set; } = new User();
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            var respone = await Http.PostAsJsonAsync("api/Users", User);
+            respone.EnsureSuccessStatusCode();
+
+            var content = await respone.Content.ReadAsStringAsync();
+            var user = JsonConvert.DeserializeObject<Company>(content);
+
+            Navigation.NavigateTo($"/Userr");
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

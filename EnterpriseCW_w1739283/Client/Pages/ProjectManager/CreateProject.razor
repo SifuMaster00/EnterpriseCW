@@ -1,0 +1,53 @@
+﻿@page "/Dashboard/CreateProject"
+
+@attribute [Authorize]
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Create Project</h3>
+
+
+<EditForm Model="Project" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Project.Name"></InputText>
+        <ValidationMessage For="@(()=>Project.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Project.Description"></InputText>
+        <ValidationMessage For="@(()=>Project.Description)" />
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    private Project Project { get; set; } = new Project();
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            var respone = await Http.PostAsJsonAsync("api/Projects", Project);
+            respone.EnsureSuccessStatusCode();
+
+            var content = await respone.Content.ReadAsStringAsync();
+            var project = JsonConvert.DeserializeObject<Project>(content);
+
+            Navigation.NavigateTo($"/projectt");
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

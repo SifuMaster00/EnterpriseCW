@@ -1,0 +1,77 @@
+﻿@page "/projects/edit/{Id:guid}"
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Edit Project</h3>
+
+
+<EditForm Model="Project" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Project.Name"></InputText>
+        <ValidationMessage For="@(()=>Project.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Project.Description"></InputText>
+        <ValidationMessage For="@(()=>Project.Description)" />
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Project Project { get; set; } = new Project();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //await Http.DeleteAsync($"/api/Todos/{Id}");
+            Project = await Http.GetFromJsonAsync<Project>($"/api/projects/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            var respone = await Http.PutAsJsonAsync($"/api/projects/{Project.Id}", Project);
+            respone.EnsureSuccessStatusCode();
+
+            //var content = await respone.Content.ReadAsStringAsync();
+            //var todo = JsonConvert.DeserializeObject<Todo>(content);
+
+            Navigation.NavigateTo($"/projectt");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}
+

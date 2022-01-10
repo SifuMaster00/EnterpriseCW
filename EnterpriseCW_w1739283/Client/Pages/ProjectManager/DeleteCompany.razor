@@ -1,0 +1,71 @@
+﻿@page "/companies/delete/{Id:guid}"
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Are you sure you want to delete this company!!</h3>
+
+
+
+<EditForm Model="Company" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Company.Name"></InputText>
+        <ValidationMessage For="@(()=>Company.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Company.Description"></InputText>
+        <ValidationMessage For="@(()=>Company.Description)" />
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Delete</button>
+
+</EditForm>
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Company Company { get; set; } = new Company();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            Company = await Http.GetFromJsonAsync<Company>($"/api/companies/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+     private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            await Http.DeleteAsync($"/api/companies/{Id}");
+
+            Navigation.NavigateTo($"/companyy");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+}
+

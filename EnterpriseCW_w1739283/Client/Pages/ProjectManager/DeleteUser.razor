@@ -1,0 +1,76 @@
+﻿@page "/Users/delete/{Id:guid}"
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Are you sure you want to delete this user!!</h3>
+
+
+
+<EditForm Model="User" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="User.Name"></InputText>
+        <ValidationMessage For="@(()=>User.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Email</label>
+        <InputText @bind-Value="User.Email"></InputText>
+        <ValidationMessage For="@(()=>User.Email)" />
+    </div>
+     <div class="form-group">
+        <label class="control-label">UserName</label>
+        <InputText @bind-Value="User.UserName"></InputText>
+        <ValidationMessage For="@(()=>User.UserName)" />
+    </div>
+
+    
+    <button type="submit" class="btn btn-primary">Delete</button>
+
+</EditForm>
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private User User { get; set; } = new User();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            User = await Http.GetFromJsonAsync<User>($"/api/Users/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            await Http.DeleteAsync($"/api/Users/{Id}");
+
+            Navigation.NavigateTo($"/Userr");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+}
+

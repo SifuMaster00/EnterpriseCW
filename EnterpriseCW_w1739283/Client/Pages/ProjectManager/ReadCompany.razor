@@ -1,0 +1,68 @@
+﻿@page "/companies/details/{Id:guid}"
+
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+
+<h4>Company Name:</h4>
+<p>
+    <h3>@Company.Name</h3>
+</p>
+
+<h4>Company Description:</h4>
+<p>
+    <h3>@Company.Description</h3>
+</p>
+
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Company Company { get; set; } = new Company();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //await Http.DeleteAsync($"/api/Todos/{Id}");
+            Company = await Http.GetFromJsonAsync<Company>($"/api/companies/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            //var respone = await Http.PutAsJsonAsync($"/api/Todos/{Todo.Id}", Todo);
+            //respone.EnsureSuccessStatusCode();
+
+            //var content = await respone.Content.ReadAsStringAsync();
+            //var todo = JsonConvert.DeserializeObject<Todo>(content);
+
+            Navigation.NavigateTo($"/Companyy");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

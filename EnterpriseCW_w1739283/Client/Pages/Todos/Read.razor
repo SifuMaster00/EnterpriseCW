@@ -1,0 +1,64 @@
+﻿@page "/todos/Details/{Id:guid}"
+
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+
+<h4>Company Name:</h4>
+<p>@Todo.Name</p>
+
+<h4>Company Description:</h4>
+<p>@Todo.Description</p>
+
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Todo Todo { get; set; } = new Todo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //await Http.DeleteAsync($"/api/Todos/{Id}");
+            Todo = await Http.GetFromJsonAsync<Todo>($"/api/Todos/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            //var respone = await Http.PutAsJsonAsync($"/api/Todos/{Todo.Id}", Todo);
+            //respone.EnsureSuccessStatusCode();
+
+            //var content = await respone.Content.ReadAsStringAsync();
+            //var todo = JsonConvert.DeserializeObject<Todo>(content);
+
+            Navigation.NavigateTo($"/todos");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

@@ -1,0 +1,53 @@
+﻿@page "/todos/create"
+
+@attribute [Authorize]
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Create Todos</h3>
+
+
+<EditForm Model="Todo" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Todo.Name"></InputText>
+        <ValidationMessage For="@(()=>Todo.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Todo.Description"></InputText>
+        <ValidationMessage For="@(()=>Todo.Description)" />
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    private Todo Todo { get; set; } = new Todo();
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            var respone = await Http.PostAsJsonAsync("api/Todos", Todo);
+            respone.EnsureSuccessStatusCode();
+
+            var content = await respone.Content.ReadAsStringAsync();
+            var todo = JsonConvert.DeserializeObject<Todo>(content);
+
+            Navigation.NavigateTo($"/todos");
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

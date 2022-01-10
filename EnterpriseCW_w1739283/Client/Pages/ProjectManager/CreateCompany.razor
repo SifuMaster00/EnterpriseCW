@@ -1,0 +1,53 @@
+﻿@page "/Dashboard/CreateCompany"
+
+@attribute [Authorize]
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Create Comapny</h3>
+
+
+<EditForm Model="Company" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Company.Name"></InputText>
+        <ValidationMessage For="@(()=>Company.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Company.Description"></InputText>
+        <ValidationMessage For="@(()=>Company.Description)" />
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    private Company Company { get; set; } = new Company();
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            var respone = await Http.PostAsJsonAsync("api/Companies", Company);
+            respone.EnsureSuccessStatusCode();
+
+            var content = await respone.Content.ReadAsStringAsync();
+            var company = JsonConvert.DeserializeObject<Company>(content);
+
+            Navigation.NavigateTo($"/Companyy");
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

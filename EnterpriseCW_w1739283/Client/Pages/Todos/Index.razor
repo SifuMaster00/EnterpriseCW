@@ -1,0 +1,66 @@
+﻿@page "/todos"
+@inject HttpClient Http;
+<h3> List Todos</h3>
+
+
+<div class="table-responsive">
+
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Read</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var todo in Todo)
+            {
+                <tr>
+                    <td>
+                        @todo.Name
+                    </td>
+                    <td>
+                        <a href="/todos/details/@todo.Id">Details</a>
+                    </td>
+                    <td>
+                        <a href="/todos/edit/@todo.Id">Edit</a>
+
+                    </td>
+                    <td>
+                        <a href="/todos/delete/@todo.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<p>
+    <a class="btn btn-primary" href="/todos/create">Create</a>
+</p>
+
+@code {
+    private List<Todo> Todo = new List<Todo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Todo = await Http.GetFromJsonAsync<List<Todo>>("api/Todos");
+
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+
+        }
+    }
+}
+

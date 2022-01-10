@@ -1,0 +1,71 @@
+﻿@page "/Projects/delete/{Id:guid}"
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Are you sure you want to delete this project!!</h3>
+
+
+
+<EditForm Model="Project" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Project.Name"></InputText>
+        <ValidationMessage For="@(()=>Project.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Project.Description"></InputText>
+        <ValidationMessage For="@(()=>Project.Description)" />
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Delete</button>
+
+</EditForm>
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Project Project { get; set; } = new Project();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            Project = await Http.GetFromJsonAsync<Project>($"/api/projects/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            await Http.DeleteAsync($"/api/projects/{Id}");
+
+            Navigation.NavigateTo($"/projectt");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+}
+

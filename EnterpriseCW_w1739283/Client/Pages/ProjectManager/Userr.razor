@@ -1,0 +1,69 @@
+﻿@page "/Userr"
+@inject HttpClient Http;
+
+<h3>List of Users</h3>
+
+<div class="table-responsive">
+
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Read</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in User)
+            {
+                <tr>
+                    <td>
+                        @*<a class="btn btn-primary" href="@company.Name">@company.Name</a>*@
+                        @user.Name
+                    </td>
+                    <td>
+                        <a href="/users/details/@user.Id">Details</a>
+                    </td>
+                    <td>
+                        <a href="/users/edit/@user.Id">Edit</a>
+
+                    </td>
+                    <td>
+                        <a href="/users/delete/@user.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<p>
+    <a class=" btn btn-primary" href="/Dashboard/CreateUser">createuser</a>
+</p>
+
+@code {
+    // blue is assing the class
+    //white is assigned
+    private List<User> User = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            User = await Http.GetFromJsonAsync<List<User>>("api/Users");
+
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+
+        }
+    }
+
+}

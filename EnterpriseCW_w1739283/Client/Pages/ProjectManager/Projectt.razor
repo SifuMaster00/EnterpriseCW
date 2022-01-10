@@ -1,0 +1,70 @@
+﻿@page "/projectt"
+@inject HttpClient Http;
+
+<h3>List of Projects</h3>
+
+<div class="table-responsive">
+
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Read</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var project in Project)
+            {
+                <tr>
+                    <td>
+                        @*<a class="btn btn-primary" href="@company.Name">@company.Name</a>*@
+                        @project.Name
+                    </td>
+                    <td>
+                        <a href="/Projects/details/@project.Id">Details</a>
+                    </td>
+                    <td>
+                        <a href="/Projects/edit/@project.Id">Edit</a>
+
+                    </td>
+                    <td>
+                        <a href="/Projects/delete/@project.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<p>
+    <a class=" btn btn-primary" href="/Dashboard/CreateProject">createproject</a>
+</p>
+
+@code {
+    // blue is assing the class
+    //white is assigned
+    private List<Project> Project = new List<Project>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Project = await Http.GetFromJsonAsync<List<Project>>("api/projects");
+
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+
+        }
+    }
+
+}
+

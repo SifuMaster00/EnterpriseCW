@@ -1,0 +1,76 @@
+﻿@page "/todos/edit/{Id:guid}"
+
+@inject NavigationManager Navigation
+@inject HttpClient Http
+<h3>Edit Todos</h3>
+
+
+<EditForm Model="Todo" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Todo.Name"></InputText>
+        <ValidationMessage For="@(()=>Todo.Name)" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Todo.Description"></InputText>
+        <ValidationMessage For="@(()=>Todo.Description)" />
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Todo Todo { get; set; } = new Todo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //await Http.DeleteAsync($"/api/Todos/{Id}");
+            Todo = await Http.GetFromJsonAsync<Todo>($"/api/Todos/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            var respone = await Http.PutAsJsonAsync($"/api/Todos/{Todo.Id}", Todo);
+            respone.EnsureSuccessStatusCode();
+
+            //var content = await respone.Content.ReadAsStringAsync();
+            //var todo = JsonConvert.DeserializeObject<Todo>(content);
+
+            Navigation.NavigateTo($"/todos");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

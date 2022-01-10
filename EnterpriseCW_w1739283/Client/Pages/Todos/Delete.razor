@@ -1,0 +1,88 @@
+﻿@page "/todos/delete/{Id:guid}"
+
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Are you sure you want to delete this todo</h3>
+
+@*<h4>Title</h4>
+
+<p>@Todo.Name</p>
+
+<h4>Description</h4>
+<p>@Todo.Description</p>
+
+
+<button class="btn btn-primary" @onclick="HandleValidSubmit">Delete</button>*@
+
+<EditForm Model="Todo" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText @bind-Value="Todo.Name"></InputText>
+        @*<ValidationMessage For="@(()=>Todo.Name)" />*@
+    </div>
+    <div class="form-group">
+        <label class="control-label">Description</label>
+        <InputText @bind-Value="Todo.Description"></InputText>
+        @*<ValidationMessage For="@(()=>Todo.Description)" />*@
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Delete</button>
+
+</EditForm>
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    private Todo Todo { get; set; } = new Todo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            Todo = await Http.GetFromJsonAsync<Todo>($"/api/Todos/{Id}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+
+
+
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+
+            //var respone = await Http.PutAsJsonAsync($"/api/Todos/{Todo.Id}", Todo);
+            //respone.EnsureSuccessStatusCode();
+
+            //var content = await respone.Content.ReadAsStringAsync();
+            //var todo = JsonConvert.DeserializeObject<Todo>(content);
+            await Http.DeleteAsync($"/api/Todos/{Id}");
+
+            Navigation.NavigateTo($"/todos");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+}
